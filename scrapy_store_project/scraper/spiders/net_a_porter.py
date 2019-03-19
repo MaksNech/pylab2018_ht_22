@@ -2,21 +2,23 @@ import scrapy
 import re
 import json
 from ..items import ScraperItem
+from scrapy_redis.spiders import RedisSpider
 
 
-class NetAPorterBagsSpider(scrapy.Spider):
+class NetAPorterBagsSpider(RedisSpider):
     name = 'net_a_porter_bags'
 
     allowed_domains = [
         'net-a-porter.com',
     ]
 
-    start_urls = [
-        'https://www.net-a-porter.com/us/en/d/Shop/Bags/All?cm_sp=topnav-_-bags-_-topbar&pn=1&npp=60&image_view=product\
-        &dScroll=0',
-    ]
+    # start_urls = [
+    #    'https://www.net-a-porter.com/us/en/d/Shop/Bags/All?cm_sp=topnav-_-bags-_-topbar&pn=1&npp=60&image_view=product&dScroll=0',
+    # ]
 
-    custom_settings = {'DOWNLOAD_DELAY': 1, }
+    custom_settings = {
+        'DOWNLOAD_DELAY': 1,
+    }
 
     def parse(self, response):
         pagination_next_page_href = response.xpath("//a[@class='next-page']/@href").extract_first()
@@ -42,6 +44,15 @@ class NetAPorterBagsSpider(scrapy.Spider):
             pagination_next_page_href = response.urljoin(pagination_next_page_href)
             yield scrapy.Request(url=pagination_next_page_href, callback=self.parse)
 
+    def get_brand(self, response):
+        brand = response.xpath("//a[@class='designer-name']/span/text()").extract_first()
+        return 'HEELLLLLOOOOOO'
+
+
+    def get_title(self, response):
+        title = response.xpath("//h2[@class='product-name']/text()").extract_first()
+        return 'HEELLLLLOOOOOO'
+
     def get_description(self, response):
         desc_p = response.xpath(
             "//div[@class='product-details']/widget-show-hide[@id='accordion-2']/div[@class='show-hide-content']/div\
@@ -49,16 +60,22 @@ class NetAPorterBagsSpider(scrapy.Spider):
         desc_ul = response.xpath("//div[@class='product-details']/widget-show-hide[@id='accordion-2']/div\
             [@class='show-hide-content']/div[@class='wrapper']/ul/li/text()").extract()
 
+        desc_ul = '\n'.join(desc_ul)
+
         desc_p = re.sub(r'\s', ' ', desc_p)
 
-        return {'p': desc_p, 'ul': desc_ul}
+        # return desc_p + desc_ul
+        return 'HEELLLLLOOOOOO'
 
     def get_size(self, response):
         size_ul = response.xpath(
             "//div[@class='product-details']/widget-show-hide[@id='accordion-1']/div[@class='show-hide-content']/div\
             [@class='wrapper']/ul/li/text()").extract()
 
-        return size_ul
+        size_ul = '\n'.join(size_ul)
+
+        # return size_ul
+        return 'HEELLLLLOOOOOO'
 
     def get_price(self, response):
         price = response.xpath(
@@ -67,20 +84,30 @@ class NetAPorterBagsSpider(scrapy.Spider):
         currency = price['currency']
         amount = int(price['amount']) / int(price['divisor'])
 
-        return {'currency': currency, 'amount': amount}
+        # return '{} {}'.format(amount, currency)
+
+        return 'HEELLLLLOOOOOO'
+
 
     def get_images(self, response):
         images_sources_list = response.xpath(
-            "//ul[contains(@class,'swiper-wrapper')]/li/img/@src|//div[@class='product-image']/img/@src").extract()
+            "//ul[contains(@class,'swiper-wrapper')]/li/img[contains(@class,'product-image') and contains\
+            (@class,'first-image')]/@src|//div[@class='product-image']/img/@src").extract()
 
         images_sources_list = list(dict.fromkeys(images_sources_list))
-        images_sources_list = [response.urljoin(src) for src in images_sources_list]
-        return images_sources_list
+        main_image_src = ''
+        for src in images_sources_list:
+            if 'in_xs' in src:
+                main_image_src = src.replace('in_xs', 'in_pp')
+
+        # return response.urljoin(main_image_src)
+
+        return 'HEELLLLLOOOOOO'
 
     def parse_bag_page(self, response):
         item = ScraperItem()
-        item['brand'] = response.xpath("//a[@class='designer-name']/span/text()").extract_first()
-        item['title'] = response.xpath("//h2[@class='product-name']/text()").extract_first()
+        item['brand'] = self.get_brand(response)
+        item['title'] = self.get_title(response)
         item['price'] = self.get_price(response)
         item['description'] = self.get_description(response)
         item['size'] = self.get_size(response)
