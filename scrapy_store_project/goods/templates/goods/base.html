@@ -22,6 +22,10 @@
     <!-- Font-awesome styles  -->
     <link rel="stylesheet" href="{% static 'font-awesome/css/font-awesome.min.css' %}">
 
+    <!-- Loading-bar core and styles  -->
+    <script src="{% static 'loading-bar/loading-bar.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'loading-bar/loading-bar.css' %}">
+
     <!-- Custom styles for this template -->
     <style>
         .bd-placeholder-img {
@@ -34,16 +38,23 @@
                 font-size: 3.5rem;
             }
         }
+
+
+
     </style>
 
     <link href="{% static 'goods/css/goods.css' %}" rel="stylesheet">
 
 </head>
 <body>
+
+<form class="" id="scraping_form" action="{% url 'scraping' %}" method="post"
+      enctype="multipart/form-data">{% csrf_token %}</form>
+
 <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-    <a class="navbar-brand" href="#">
-     <img class="img-fluid rounded float-left"  src="{% static 'goods/img/logo.png' %}" alt="">
-    </a>
+    <div class="navbar-brand" href="#">
+        <img class="img-fluid rounded float-left" src="{% static 'goods/img/logo.png' %}" alt="">
+    </div>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault"
             aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -62,8 +73,9 @@
                 <div class="dropdown-menu" aria-labelledby="dishes_dropdown">
                     <a class="dropdown-item" href="#">
                         <i class="fa fa-th-list" aria-hidden="true"></i> List all</a>
-                    <a class="dropdown-item" href="#">
-                        <i class="fa fa-plus" aria-hidden="true"></i> Add new</a>
+                    <button class="dropdown-item" data-toggle="modal" data-target="#exampleModalCenter">
+                        <i class="fa fa-exchange" aria-hidden="true"></i> Scraping
+                    </button>
                 </div>
             </li>
 
@@ -71,15 +83,15 @@
         {% block search %}{% endblock %}
 
     </div>
+
 </nav>
 
 <main role="main">
     {% block jumbotron %}{% endblock %}
 
-    {% block carousel %}{% endblock %}
-
     {% block content %}{% endblock %}
-    <hr>
+
+
 </main>
 
 <footer class="my-5 pt-5 text-muted text-center text-small">
@@ -90,6 +102,35 @@
         <li class="list-inline-item"><a href="#">"Support"</a></li>
     </ul>
 </footer>
+
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
+     aria-labelledby="exampleModalCenterTitle"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalCenterTitle">Start Scraper</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Press "Start" to begin scraping data. Press "Stop" to stop and exit.
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" form="scraping_form">
+                    <i class="fa fa-play" aria-hidden="true"> Start</i>
+                </button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    <i class="fa fa-stop" aria-hidden="true"> Stop</i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 </body>
 
