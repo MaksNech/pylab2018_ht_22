@@ -28,5 +28,6 @@ class Bag(models.Model):
 def bag_img_delete(sender, instance, **kwargs):
     instance.image.delete(False)
 
+
 # End
 ########################################################################################################################
