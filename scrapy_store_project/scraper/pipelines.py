@@ -8,6 +8,7 @@
 import os
 import sys
 import django
+from scrapy import signals
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -31,3 +32,16 @@ class ScraperPipeline(object):
             save_goods_to_db.delay(self.items_list)
             self.items_list = []
         return item
+
+    @classmethod
+    def from_crawler(cls, crawler, *args, **kwargs):
+        pipeline = cls()
+        crawler.signals.connect(pipeline.spider_finished, signals.spider_idle)
+        return pipeline
+
+    def spider_finished(self, **kwargs):
+        if self.items_list:
+            save_goods_to_db.delay(self.items_list)
+            self.items_list = []
+
+
