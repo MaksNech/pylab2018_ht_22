@@ -11,7 +11,6 @@ import django
 from scrapy import signals
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-
 sys.path.append(os.path.join(BASE_DIR, 'store'))
 os.environ['DJANGO_SETTINGS_MODULE'] = 'store.settings'
 django.setup()
