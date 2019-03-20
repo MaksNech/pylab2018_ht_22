@@ -25,19 +25,9 @@ class ScraperPipeline(object):
         self.items_list = []
 
     def process_item(self, item, spider):
-        self.items_list.append(item)
-        print("*" * 20)
-        print("*" * 20)
-        print('COUNT:{}'.format(len(self.items_list)))
-        print("*" * 20)
-        print("*" * 20)
+        self.items_list.append(item._values)
+
         if len(self.items_list) == 10:
-            print("*"*20)
-            print("*" * 20)
-            print(self.items_list)
-            print("*" * 20)
-            print("*" * 20)
             save_goods_to_db.delay(self.items_list)
             self.items_list = []
         return item
-
