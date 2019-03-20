@@ -1,4 +1,6 @@
 from django.db import models
+from django.dispatch import receiver
+from django.db.models.signals import post_delete, post_save
 
 
 # Create your models here.
@@ -17,3 +19,14 @@ class Bag(models.Model):
 
     class Meta:
         ordering = ['-created_on']
+
+# SIGNALS:  ############################################################################################################
+# Begin
+
+# delete img with bag instance
+@receiver(post_delete, sender=Bag)
+def bag_img_delete(sender, instance, **kwargs):
+    instance.image.delete(False)
+
+# End
+########################################################################################################################
