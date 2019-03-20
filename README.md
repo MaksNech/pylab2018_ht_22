@@ -27,8 +27,30 @@ Inside project directory run app with terminal command:
 ```bash
 python3 manage.py runserver
 ```
-#### Start Scrapy:
-Inside project directory run scrapy with terminal command:
+#### Admin:
+##### Username: admin
+##### Email address: admin@mail.com
+##### Password: 123
+
+#### Start Scraping data:
+Inside project directory run celery and scrapy with terminal commands:
 ```bash
+celery -A store worker -l info
+
 scrapy crawl net_a_porter_bags
+```
+Then go to the site in browser and press 'scrapping' button.
+
+#### Clear Redis:
+enter to Redis:
+```bash
+redis-cli
+```
+clear all databases:
+```bash
+FLUSHDB
+```
+show keys in Redis:
+```bash
+keys *
 ```
