@@ -12,15 +12,17 @@ class NetAPorterBagsSpider(RedisSpider):
         'net-a-porter.com',
     ]
 
-    # start_urls = [
-    #    'https://www.net-a-porter.com/us/en/d/Shop/Bags/All?cm_sp=topnav-_-bags-_-topbar&pn=1&npp=60&image_view=product&dScroll=0',
-    # ]
-
     custom_settings = {
-        'DOWNLOAD_DELAY': 1,
+        'DOWNLOAD_DELAY': 2,
     }
 
+    def get_pages_count(self, response):
+        count_of_pages = response.xpath('//div[@class="pagination-links"]/@data-lastpage').extract_first()
+        return int(count_of_pages)
+
+
     def parse(self, response):
+
         pagination_next_page_href = response.xpath("//a[@class='next-page']/@href").extract_first()
 
         if pagination_next_page_href:
@@ -46,12 +48,13 @@ class NetAPorterBagsSpider(RedisSpider):
 
     def get_brand(self, response):
         brand = response.xpath("//a[@class='designer-name']/span/text()").extract_first()
-        return 'HEELLLLLOOOOOO'
-
+        brand = ''.join(brand)
+        return brand
 
     def get_title(self, response):
         title = response.xpath("//h2[@class='product-name']/text()").extract_first()
-        return 'HEELLLLLOOOOOO'
+        title = ''.join(title)
+        return title
 
     def get_description(self, response):
         desc_p = response.xpath(
@@ -64,8 +67,7 @@ class NetAPorterBagsSpider(RedisSpider):
 
         desc_p = re.sub(r'\s', ' ', desc_p)
 
-        # return desc_p + desc_ul
-        return 'HEELLLLLOOOOOO'
+        return desc_p + '\n' + desc_ul
 
     def get_size(self, response):
         size_ul = response.xpath(
@@ -74,8 +76,7 @@ class NetAPorterBagsSpider(RedisSpider):
 
         size_ul = '\n'.join(size_ul)
 
-        # return size_ul
-        return 'HEELLLLLOOOOOO'
+        return size_ul
 
     def get_price(self, response):
         price = response.xpath(
@@ -84,10 +85,7 @@ class NetAPorterBagsSpider(RedisSpider):
         currency = price['currency']
         amount = int(price['amount']) / int(price['divisor'])
 
-        # return '{} {}'.format(amount, currency)
-
-        return 'HEELLLLLOOOOOO'
-
+        return '{} {}'.format(amount, currency)
 
     def get_images(self, response):
         images_sources_list = response.xpath(
@@ -100,9 +98,9 @@ class NetAPorterBagsSpider(RedisSpider):
             if 'in_xs' in src:
                 main_image_src = src.replace('in_xs', 'in_pp')
 
-        # return response.urljoin(main_image_src)
+        return response.urljoin(main_image_src)
 
-        return 'HEELLLLLOOOOOO'
+
 
     def parse_bag_page(self, response):
         item = ScraperItem()

@@ -1,11 +1,8 @@
 from django.urls import path
 from . import views
-from .views import StartScrapingView
-
+from .views import StartScrapingView, BagListView
 
 urlpatterns = [
-    path('', views.index, name='index'),
     path('scraping/', StartScrapingView.as_view(), name='scraping'),
-
-
+    path('', BagListView.as_view(), name='index'),
 ]

@@ -1,23 +1,12 @@
-
-import redis
-import json
-from django.http import HttpResponse
 from django.views import View
 from django.shortcuts import render
 from django.views.generic import ListView
-import os
 
-
+from .models import Bag
 from . import redis_client
 
 
 class StartScrapingView(View):
-    # def __init__(self):
-    #     super(StartScrapingView, self).__init__()
-    #     self.r = redis.Redis(
-    #         host='localhost',
-    #         port=6379
-    #     )
 
     def get(self, request, *args, **kwargs):
         return render(self.request, 'goods/scraping.html')
@@ -31,14 +20,13 @@ class StartScrapingView(View):
         return render(self.request, 'goods/scraping.html')
 
 
+class BagListView(ListView):
+    model = Bag
+    template_name = 'goods/bag_list.html'
+    context_object_name = 'bags'
+    paginate_by = 10
 
-def index(request):
-    # goods = Good.objects.all()
-    goods = []
-    BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-    p=os.path.join(BASE_DIR, 'store')
-    print(p)
-    return render(request, 'goods/index.html', context={'goods': goods})
-
-
-
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['queryset'] = Bag.objects.all()
+        return context

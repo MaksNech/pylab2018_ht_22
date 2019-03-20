@@ -1,4 +1,7 @@
+import requests
+import tempfile
 from celery.task import task
+from django.core import files
 from celery.utils.log import get_task_logger
 
 from .models import Bag
@@ -10,29 +13,27 @@ logger = get_task_logger(__name__)
     name="save_goods_to_db"
 )
 def save_goods_to_db(items_list):
-    print("*" * 20)
-    print("*" * 20)
-    print('IN TASK '*5)
-    print("*" * 20)
-    print("*" * 20)
 
-    # for item in items_list:
-        # bag = Bag(
-        #     title=item['title'],
-        #     brand=item['brand'],
-        #     image=item['image'],
-        #     price=item['price'],
-        #     size=item['size'],
-        #     description=item['description']
-        # )
-        # bag.save()
-        # print("*" * 20)
-        # print("*" * 20)
-        # print(item)
-        # print(item['brand'])
-        # print(item['image'])
-        # print(item['price'])
-        # print(item['size'])
-        # print(item['description'])
-        # print("*" * 20)
-        # print("*" * 20)
+    for item in items_list:
+        bag = Bag(
+            title=item['title'],
+            brand=item['brand'],
+            image=item['image'],
+            price=item['price'],
+            size=item['size'],
+            description=item['description']
+        )
+
+        request = requests.get(item['image'], stream=True)
+        if request.status_code != requests.codes.ok:
+            continue
+        file_name = item['image'].split('/')[-1]
+        lf = tempfile.NamedTemporaryFile()
+        for block in request.iter_content(1024 * 8):
+            if not block:
+                break
+            lf.write(block)
+
+        bag.image.save(file_name, files.File(lf))
+
+        bag.save()
