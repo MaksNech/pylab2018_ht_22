@@ -1,4 +1,4 @@
-# Home task 22 (Django app & Scrapy)
+# Django app & Scrapy
 
 ## 1: Initial Setup
 
